@@ -11,7 +11,12 @@ export const solveTask = async (task, language = 'python') => {
     });
     return response.data;
   } catch (error) {
-    throw error.response?.data || error.message;
+    const detail = error.response?.data?.detail;
+    const message =
+      typeof detail === 'string'
+        ? detail
+        : error.response?.data?.message || error.message || 'Request failed';
+    throw new Error(message);
   }
 };
 
@@ -20,6 +25,11 @@ export const getTaskStatus = async (taskId) => {
     const response = await axios.get(`${API_BASE}/status/${taskId}`);
     return response.data;
   } catch (error) {
-    throw error.response?.data || error.message;
+    const detail = error.response?.data?.detail;
+    const message =
+      typeof detail === 'string'
+        ? detail
+        : error.response?.data?.message || error.message || 'Request failed';
+    throw new Error(message);
   }
 };
