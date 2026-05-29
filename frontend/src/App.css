@@ -1,0 +1,351 @@
+/* ==================== GLOBAL STYLES ==================== */
+.app-container {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  /* ==================== HEADER ==================== */
+  .app-header {
+    text-align: center;
+    color: white;
+    margin-bottom: 40px;
+    animation: slideDown 0.6s ease-out;
+  }
+  
+  .app-header h1 {
+    font-size: 3em;
+    margin-bottom: 10px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  }
+  
+  .app-header p {
+    font-size: 1.2em;
+    opacity: 0.9;
+    letter-spacing: 2px;
+  }
+  
+  /* ==================== MAIN CONTENT ==================== */
+  .app-main {
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+    flex: 1;
+  }
+  
+  /* ==================== TASK FORM ==================== */
+  .task-form {
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    margin-bottom: 30px;
+    animation: slideUp 0.6s ease-out;
+  }
+  
+  .form-group {
+    margin-bottom: 20px;
+  }
+  
+  .form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #333;
+    font-size: 1em;
+  }
+  
+  .form-group textarea,
+  .form-group select {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 1em;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    transition: all 0.3s ease;
+  }
+  
+  .form-group textarea:focus,
+  .form-group select:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  }
+  
+  .form-group textarea:disabled,
+  .form-group select:disabled {
+    background-color: #f5f5f5;
+    cursor: not-allowed;
+  }
+  
+  .submit-btn {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.1em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+  }
+  
+  .submit-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+  }
+  
+  .submit-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  
+  /* ==================== LOADING STATE ==================== */
+  .loading-box {
+    background: white;
+    padding: 60px 30px;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    animation: slideUp 0.6s ease-out;
+  }
+  
+  .spinner {
+    width: 50px;
+    height: 50px;
+    margin: 0 auto 20px;
+    border: 4px solid #f0f0f0;
+    border-top: 4px solid #667eea;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  
+  .loading-box p {
+    color: #666;
+    font-size: 1.1em;
+    margin-top: 20px;
+  }
+  
+  /* ==================== ERROR STATE ==================== */
+  .error-box {
+    background: #fff5f5;
+    border-left: 4px solid #ff6b6b;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    animation: slideUp 0.6s ease-out;
+  }
+  
+  .error-box h3 {
+    color: #ff6b6b;
+    margin-bottom: 10px;
+  }
+  
+  .error-box p {
+    color: #666;
+  }
+  
+  /* ==================== AGENT OUTPUT ==================== */
+  .agent-output {
+    animation: slideUp 0.6s ease-out;
+  }
+  
+  .result-summary {
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    margin-bottom: 30px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  }
+  
+  .result-summary h2 {
+    color: #667eea;
+    margin-bottom: 20px;
+    font-size: 1.8em;
+  }
+  
+  .task-info {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+  }
+  
+  .task-info p {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    color: #333;
+  }
+  
+  .task-info strong {
+    color: #667eea;
+  }
+  
+  /* ==================== AGENTS GRID ==================== */
+  .agents-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+  }
+  
+  .agent-card {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+    animation: slideUp 0.6s ease-out;
+  }
+  
+  .agent-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.3);
+  }
+  
+  .agent-header {
+    padding: 20px;
+    background: #f8f9fa;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.2s ease;
+  }
+  
+  .agent-header:hover {
+    background: #f0f0f0;
+  }
+  
+  .agent-icon {
+    font-size: 1.8em;
+  }
+  
+  .agent-name {
+    flex: 1;
+    font-weight: 600;
+    color: #333;
+  }
+  
+  .agent-tokens {
+    background: rgba(102, 126, 234, 0.1);
+    color: #667eea;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.9em;
+    font-weight: 500;
+  }
+  
+  .expand-icon {
+    color: #999;
+    font-size: 0.8em;
+    transition: transform 0.2s ease;
+  }
+  
+  .agent-content {
+    padding: 20px;
+    background: #f8f9fa;
+    max-height: 400px;
+    overflow-y: auto;
+    border-top: 1px solid #e0e0e0;
+  }
+  
+  .agent-content pre {
+    background: #1e1e1e;
+    color: #d4d4d4;
+    padding: 15px;
+    border-radius: 8px;
+    overflow-x: auto;
+    font-size: 0.9em;
+    line-height: 1.5;
+    margin: 0;
+  }
+  
+  /* ==================== SOLUTION BOX ==================== */
+  .solution-box {
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    animation: slideUp 0.6s ease-out;
+  }
+  
+  .solution-box h3 {
+    color: #667eea;
+    margin-bottom: 20px;
+    font-size: 1.4em;
+  }
+  
+  .solution-box pre {
+    background: #1e1e1e;
+    color: #d4d4d4;
+    padding: 20px;
+    border-radius: 8px;
+    overflow-x: auto;
+    font-size: 0.95em;
+    line-height: 1.6;
+    max-height: 600px;
+    overflow-y: auto;
+  }
+  
+  /* ==================== FOOTER ==================== */
+  .app-footer {
+    text-align: center;
+    color: white;
+    margin-top: 40px;
+    opacity: 0.8;
+    font-size: 0.9em;
+  }
+  
+  /* ==================== ANIMATIONS ==================== */
+  @keyframes slideDown {
+    from {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  /* ==================== RESPONSIVE ==================== */
+  @media (max-width: 768px) {
+    .app-header h1 {
+      font-size: 2em;
+    }
+  
+    .task-form {
+      padding: 20px;
+    }
+  
+    .agents-grid {
+      grid-template-columns: 1fr;
+    }
+  
+    .task-info {
+      grid-template-columns: 1fr;
+    }
+  }
