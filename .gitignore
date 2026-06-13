@@ -62,6 +62,12 @@ logs/
 .coverage
 htmlcov/
 
+# Data storage (ChromaDB, uploads, metrics)
+data/chroma/
+data/uploads/
+data/tasks.json
+data/metrics.json
+
 # Temporary files
 *.tmp
 *.bak

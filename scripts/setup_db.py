@@ -1,15 +1,36 @@
 # scripts/setup_db.py
-"""
-Database setup script.
+"""Initialize data directories, ChromaDB, and storage."""
 
-This script will initialize the database for the application.
-Placeholder for Phase 5+ when we add database support.
-"""
+import os
+import sys
+
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+
+from backend.config import settings
+
 
 def setup_database():
-    """Set up the database."""
-    print("Database setup would happen here in future phases")
-    print("For now, we're using in-memory storage")
+    """Set up data directories and vector store."""
+    dirs = [
+        settings.DATA_DIR,
+        settings.CHROMA_PATH,
+        settings.KNOWLEDGE_UPLOAD_DIR,
+        "logs",
+    ]
+    for d in dirs:
+        os.makedirs(d, exist_ok=True)
+        print(f"  OK {d}")
+
+    try:
+        from backend.rag.vector_store import vector_store
+        count = vector_store.count()
+        print(f"  OK ChromaDB initialized ({count} chunks)")
+    except Exception as e:
+        print(f"  WARN ChromaDB: {e} (will initialize on first use)")
+
+    print("\nSetup complete. Configure .env for MCP integrations (GitHub, Slack, Jira).")
+
 
 if __name__ == "__main__":
+    print("Setting up data storage...\n")
     setup_database()

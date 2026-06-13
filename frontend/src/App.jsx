@@ -1,5 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import ChatInterface from './components/ChatInterface';
+import KnowledgePanel from './components/KnowledgePanel';
+import AnalyticsPanel from './components/AnalyticsPanel';
 import { solveTask } from './services/api';
 import './App.css';
 
@@ -8,12 +10,14 @@ function App() {
     {
       id: 0,
       type: 'assistant',
-      text: 'Hi! 👋 I\'m your Multi-Agent Coding Assistant. Submit a coding task and I\'ll break it down, write the code, review it, and create tests. What would you like me to build?',
+      text: 'Hi! 👋 I\'m your Multi-Agent Coding Assistant with RAG, tool calling, MCP integrations, enhanced testing, and analytics. Upload coding standards in the Knowledge panel, then submit a task!',
       timestamp: new Date()
     }
   ]);
-  
+
   const [loading, setLoading] = useState(false);
+  const [activePanel, setActivePanel] = useState(null);
+  const [useKnowledge, setUseKnowledge] = useState(true);
   const messagesEndRef = useRef(null);
 
   const scrollToBottom = () => {
@@ -35,60 +39,39 @@ function App() {
     setLoading(true);
 
     try {
-      const response = await solveTask(task, language);
+      const response = await solveTask(task, language, { useKnowledge });
 
-      const planMessage = {
-        id: messages.length + 1,
-        type: 'agent',
-        agent: 'Planner',
-        icon: '📍',
-        text: response.agent_outputs[0].output,
-        tokens: response.agent_outputs[0].tokens_used,
-        timestamp: new Date()
-      };
-      setMessages(prev => [...prev, planMessage]);
+      const agentIcons = { Planner: '📍', Coder: '💻', Reviewer: '🔍', Tester: '🧪' };
+      let nextId = messages.length + 1;
 
-      const codeMessage = {
-        id: messages.length + 2,
-        type: 'agent',
-        agent: 'Coder',
-        icon: '💻',
-        text: response.agent_outputs[1].output,
-        tokens: response.agent_outputs[1].tokens_used,
-        timestamp: new Date()
-      };
-      setMessages(prev => [...prev, codeMessage]);
-
-      const reviewMessage = {
-        id: messages.length + 3,
-        type: 'agent',
-        agent: 'Reviewer',
-        icon: '🔍',
-        text: response.agent_outputs[2].output,
-        tokens: response.agent_outputs[2].tokens_used,
-        timestamp: new Date()
-      };
-      setMessages(prev => [...prev, reviewMessage]);
-
-      const testMessage = {
-        id: messages.length + 4,
-        type: 'agent',
-        agent: 'Tester',
-        icon: '🧪',
-        text: response.agent_outputs[3].output,
-        tokens: response.agent_outputs[3].tokens_used,
-        timestamp: new Date()
-      };
-      setMessages(prev => [...prev, testMessage]);
+      for (const agent of response.agent_outputs) {
+        const agentMessage = {
+          id: nextId++,
+          type: 'agent',
+          agent: agent.agent_name,
+          icon: agentIcons[agent.agent_name] || '🤖',
+          text: agent.output,
+          tokens: agent.tokens_used,
+          executionTime: agent.execution_time,
+          toolCalls: agent.tool_calls,
+          timestamp: new Date()
+        };
+        setMessages(prev => [...prev, agentMessage]);
+      }
 
       const summaryMessage = {
-        id: messages.length + 5,
+        id: nextId,
         type: 'summary',
         taskId: response.task_id,
         totalTokens: response.total_tokens_used,
         confidence: response.confidence_score,
+        executionTime: response.execution_time,
+        estimatedCost: response.estimated_cost_usd,
+        knowledgeUsed: response.knowledge_used,
         solution: response.solution,
         tests: response.tests,
+        testExecution: response.test_execution,
+        coverage: response.coverage,
         timestamp: new Date()
       };
       setMessages(prev => [...prev, summaryMessage]);
@@ -106,22 +89,57 @@ function App() {
     }
   };
 
+  const togglePanel = (panel) => {
+    setActivePanel(activePanel === panel ? null : panel);
+  };
+
   return (
     <div className="app-container">
       <header className="app-header">
         <h1>🤖 Multi-Agent Coding Assistant</h1>
-        <p>Planner • Coder • Reviewer • Tester</p>
+        <p>Planner • Coder • Reviewer • Tester | RAG • Tools • MCP • Analytics</p>
+        <div className="header-actions">
+          <button
+            className={`header-btn ${activePanel === 'knowledge' ? 'active' : ''}`}
+            onClick={() => togglePanel('knowledge')}
+          >
+            📚 Knowledge
+          </button>
+          <button
+            className={`header-btn ${activePanel === 'analytics' ? 'active' : ''}`}
+            onClick={() => togglePanel('analytics')}
+          >
+            📊 Analytics
+          </button>
+          <label className="knowledge-toggle">
+            <input
+              type="checkbox"
+              checked={useKnowledge}
+              onChange={(e) => setUseKnowledge(e.target.checked)}
+            />
+            Use RAG
+          </label>
+        </div>
       </header>
 
-      <ChatInterface 
-        messages={messages} 
-        onSubmit={handleSubmit}
-        loading={loading}
-        messagesEndRef={messagesEndRef}
-      />
+      <div className="main-content">
+        {activePanel === 'knowledge' && (
+          <KnowledgePanel onClose={() => setActivePanel(null)} />
+        )}
+        {activePanel === 'analytics' && (
+          <AnalyticsPanel onClose={() => setActivePanel(null)} />
+        )}
+
+        <ChatInterface
+          messages={messages}
+          onSubmit={handleSubmit}
+          loading={loading}
+          messagesEndRef={messagesEndRef}
+        />
+      </div>
 
       <footer className="app-footer">
-        <p>Powered by FastAPI + React | OpenAI GPT-4</p>
+        <p>Powered by FastAPI + React | OpenAI GPT-4 | ChromaDB | MCP</p>
       </footer>
     </div>
   );

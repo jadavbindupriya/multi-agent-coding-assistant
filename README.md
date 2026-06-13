@@ -1,22 +1,43 @@
 # Multi-Agent Coding Assistant
 
-A production-grade AI system that solves coding tasks using a 4-agent pipeline: Planner → Coder → Reviewer → Tester.
+A production-grade AI system that solves coding tasks using a 4-agent pipeline with RAG, tool calling, MCP integrations, enhanced testing, and analytics.
 
 ## Features
 
-- **Multi-Agent Orchestration** - Sequential pipeline of specialized agents
+### Core Pipeline (Phases 1-4)
+- **Multi-Agent Orchestration** - Planner → Coder → Reviewer → Tester
 - **Real-time OpenAI Integration** - Direct GPT-4 API calls
-- **Token Tracking** - Monitor API usage and costs
 - **Beautiful React UI** - Real-time agent execution display
-- **Comprehensive Testing** - Automatic test generation
-- **Code Review** - Automated quality validation
 
-## Tech Stack
+### Phase 5: RAG Integration
+- **ChromaDB** vector database for knowledge storage
+- **Document upload** (.pdf, .txt, .md) via API and UI
+- Agents search knowledge base before solving
+- Example: "Check our coding standards before writing code"
 
-- **Backend**: FastAPI, Python 3.11, OpenAI API
-- **Frontend**: React 18, Axios
-- **Database**: PostgreSQL (planned)
-- **Deployment**: Railway, Vercel (planned)
+### Phase 6: Tool Calling
+- **npm package lookup** - Check if packages exist on npm
+- **Code sandbox** - Execute Python code safely
+- **Stack Overflow search** - Find coding solutions
+- Coder agent uses tools automatically when helpful
+
+### Phase 7: MCP Integration
+- **GitHub** - Read repos, create issues
+- **Slack** - Post results to channels
+- **Jira** - Create tasks
+- Configure via environment variables
+
+### Phase 8: Enhanced Testing
+- **Test execution** - Runs generated pytest tests
+- **Property-based testing** - Hypothesis-style tests in generation
+- **Edge case detection** - Identifies edge case coverage
+- **Coverage reporting** - Line coverage analysis
+
+### Phase 9: Monitoring & Analytics
+- **Agent performance metrics** - Per-agent token and timing stats
+- **Token usage tracking** - Total tokens across all tasks
+- **Cost analysis** - Estimated USD cost per task
+- **Error monitoring** - Tracked errors with source attribution
 
 ## Quick Start
 
@@ -26,6 +47,7 @@ A production-grade AI system that solves coding tasks using a 4-agent pipeline: 
 pip install -r requirements.txt
 cp .env.example .env
 # Add your OPENAI_API_KEY to .env
+python scripts/setup_db.py
 python scripts/run_backend.py
 ```
 
@@ -42,50 +64,75 @@ npm start
 
 Frontend: `http://localhost:3000`
 
-## API Endpoints
+### Load Sample Knowledge
 
-**POST /api/solve** - Submit coding task
-```json
-{"task": "Write a prime checker", "language": "python"}
+```bash
+python scripts/ingest_docs.py data/
 ```
 
-**GET /api/status/{task_id}** - Check task status
+## API Endpoints
 
-**POST /api/evaluate** - Evaluate solution quality
+| Method | Path | Description |
+|--------|------|-------------|
+| POST | `/api/solve` | Submit coding task (with RAG + tools) |
+| GET | `/api/status/{task_id}` | Check task status |
+| POST | `/api/evaluate` | Evaluate solution quality |
+| POST | `/api/knowledge/upload` | Upload document to knowledge base |
+| POST | `/api/knowledge/search` | Search knowledge base |
+| GET | `/api/knowledge/documents` | List indexed documents |
+| GET | `/api/integrations/status` | Check MCP integration status |
+| POST | `/api/integrations/github/issue` | Create GitHub issue |
+| POST | `/api/integrations/slack/message` | Post to Slack |
+| POST | `/api/integrations/jira/task` | Create Jira task |
+| GET | `/api/analytics/summary` | System metrics and cost analysis |
+
+## Configuration
+
+See `.env.example` for all settings. Key integrations:
+
+```env
+GITHUB_TOKEN=ghp_...
+SLACK_WEBHOOK_URL=https://hooks.slack.com/...
+JIRA_URL=https://your-org.atlassian.net
+JIRA_EMAIL=you@example.com
+JIRA_API_TOKEN=...
+```
 
 ## Architecture
-FastAPI Backend
-├── Planner Agent (task analysis)
-├── Coder Agent (code generation)
-├── Reviewer Agent (quality check)
-└── Tester Agent (test generation)
+
+```
 React Frontend
-└── Real-time display of all agents
+├── Knowledge Panel (upload docs)
+├── Analytics Panel (metrics)
+└── Chat Interface (agent outputs)
+
+FastAPI Backend
+├── Orchestrator Pipeline
+├── RAG (ChromaDB)
+├── Tools (npm, sandbox, Stack Overflow)
+├── MCP (GitHub, Slack, Jira)
+├── Testing (runner + coverage)
+└── Analytics (metrics store)
+```
 
 ## Project Structure
+
+```
 ├── backend/
-│   ├── agents/ (planner, coder, reviewer, tester)
-│   ├── api/ (endpoints)
-│   ├── models/ (data schemas)
-│   └── main.py
+│   ├── agents/          # Planner, Coder, Reviewer, Tester, Evaluator
+│   ├── api/             # Routes, knowledge, integrations, analytics
+│   ├── rag/             # ChromaDB vector store
+│   ├── tools/           # Tool registry and implementations
+│   ├── mcp/             # MCP client and service integrations
+│   ├── testing/         # Test runner and coverage
+│   ├── storage/         # Task and metrics persistence
+│   ├── orchestrator/    # Pipeline orchestration
+│   └── middleware/      # Request metrics
 ├── frontend/
-│   ├── src/
-│   │   ├── components/
-│   │   ├── services/
-│   │   └── App.jsx
-└── scripts/
-
-## Example
-
-Input: "Write function to check if number is prime"
-
-Output:
-- Planner: 150 tokens (6-step strategy)
-- Coder: 124 tokens (optimized code)
-- Reviewer: 442 tokens (quality feedback)
-- Tester: 265 tokens (9 test cases)
-
-**Total: 981 tokens**
+│   └── src/components/  # Chat, Knowledge, Analytics panels
+├── data/                # ChromaDB, uploads, metrics
+└── scripts/             # Setup, ingest, run
+```
 
 ## Requirements
 

@@ -15,11 +15,11 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 if __name__ == "__main__":
     print("=" * 60)
-    print("🚀 Starting Multi-Agent Coding Assistant Backend")
+    print("Starting Multi-Agent Coding Assistant Backend")
     print("=" * 60)
-    print("\n📍 API will be available at: http://localhost:8000")
-    print("📚 API Docs at: http://localhost:8000/docs")
-    print("🛑 Press CTRL+C to stop the server\n")
+    print("\nAPI:  http://localhost:8000")
+    print("Docs: http://localhost:8000/docs")
+    print("Press CTRL+C to stop\n")
     
     uvicorn.run(
         "backend.main:app",

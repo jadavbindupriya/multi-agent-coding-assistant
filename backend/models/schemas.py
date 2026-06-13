@@ -1,117 +1,141 @@
 # backend/models/schemas.py
-"""
-Pydantic schemas for request/response validation.
-
-Pydantic = Data validation library
-Why use it?
-- Automatic validation (wrong types rejected)
-- Auto-generates API documentation
-- Type checking at runtime
-"""
+"""Pydantic schemas for request/response validation."""
 
 from pydantic import BaseModel, Field
-from typing import Optional, List
+from typing import Optional, List, Dict, Any
+
 
 # ========================
-# REQUEST SCHEMAS (Client → Server)
+# REQUEST SCHEMAS
 # ========================
 
 class SolveTaskRequest(BaseModel):
-    """Schema for when a user submits a coding task."""
-    
-    task: str = Field(
-        ...,
-        min_length=1,
-        max_length=5000,
-        description="The coding task to solve"
-    )
-    
-    language: str = Field(
-        default="python",
-        description="Programming language (python, javascript, go, etc)"
-    )
-    
-    context: Optional[str] = Field(
-        default=None,
-        description="Optional project context (coding standards, frameworks used, etc)"
-    )
-    
-    model: Optional[str] = Field(
-        default="gpt-4",
-        description="Which LLM model to use"
-    )
+    task: str = Field(..., min_length=1, max_length=5000)
+    language: str = Field(default="python")
+    context: Optional[str] = Field(default=None)
+    model: Optional[str] = Field(default="gpt-4")
+    use_knowledge: bool = Field(default=True, description="Search knowledge base before solving")
 
 
 class EvaluateResponseRequest(BaseModel):
-    """Schema for evaluating agent response quality."""
-    
-    response: str = Field(
-        ...,
-        description="The agent's response to evaluate"
-    )
-    
-    task: str = Field(
-        ...,
-        description="Original task"
-    )
-    
-    criteria: Optional[List[str]] = Field(
-        default=["correctness", "readability"],
-        description="What to evaluate"
-    )
+    response: str
+    task: str
+    criteria: Optional[List[str]] = Field(default=["correctness", "readability"])
+
+
+class GitHubIssueRequest(BaseModel):
+    owner: str
+    repo: str
+    title: str
+    body: str
+
+
+class SlackMessageRequest(BaseModel):
+    text: str
+    channel: Optional[str] = None
+
+
+class JiraTaskRequest(BaseModel):
+    summary: str
+    description: str
+
+
+class KnowledgeSearchRequest(BaseModel):
+    query: str
+    top_k: Optional[int] = 3
 
 
 # ========================
-# RESPONSE SCHEMAS (Server → Client)
+# RESPONSE SCHEMAS
 # ========================
 
 class AgentOutput(BaseModel):
-    """Output from a single agent."""
-    
-    agent_name: str = Field(description="Name of the agent (Planner, Coder, etc)")
-    output: str = Field(description="The agent's actual output")
-    tokens_used: int = Field(description="Tokens used for this agent")
-    execution_time: float = Field(description="How long it took in seconds")
-    success: bool = Field(default=True, description="Did the agent complete successfully?")
+    agent_name: str
+    output: str
+    tokens_used: int
+    execution_time: float
+    success: bool = True
+    tool_calls: List[Dict[str, Any]] = Field(default_factory=list)
+
+
+class TestExecutionResult(BaseModel):
+    passed: bool
+    total: int
+    passed_count: int
+    failed_count: int
+    output: str
+    edge_cases_found: List[str] = Field(default_factory=list)
+    has_property_tests: bool = False
+
+
+class CoverageResult(BaseModel):
+    coverage_percent: float
+    lines_covered: int
+    lines_total: int
+    meets_threshold: bool
+    report: Optional[str] = None
 
 
 class SolveTaskResponse(BaseModel):
-    """Final response to a solve task request."""
-    
-    task_id: str = Field(description="Unique ID for this task (for tracking)")
-    original_task: str = Field(description="The task that was requested")
-    solution: str = Field(description="The final solution/code")
-    explanation: str = Field(description="Explanation of the solution")
-    tests: str = Field(description="Test code for the solution")
-    agent_outputs: List[AgentOutput] = Field(description="Intermediate outputs from each agent")
-    total_tokens_used: int = Field(description="Total tokens used across all agents")
-    execution_time: float = Field(description="Total time in seconds")
-    confidence_score: float = Field(
-        ge=0.0,
-        le=1.0,
-        description="How confident are we in this solution (0-1)"
-    )
+    task_id: str
+    original_task: str
+    solution: str
+    explanation: str
+    tests: str
+    agent_outputs: List[AgentOutput]
+    total_tokens_used: int
+    execution_time: float
+    confidence_score: float = Field(ge=0.0, le=1.0)
+    knowledge_used: bool = False
+    test_execution: Optional[TestExecutionResult] = None
+    coverage: Optional[CoverageResult] = None
+    estimated_cost_usd: float = 0.0
 
 
 class TaskStatusResponse(BaseModel):
-    """Status of a task currently being processed."""
-    
-    task_id: str = Field(description="Task ID")
-    status: str = Field(description="pending, processing, completed, failed")
-    current_agent: str = Field(description="Which agent is currently working")
-    progress_percent: int = Field(description="0-100% progress")
-    messages: List[str] = Field(description="Status messages/logs")
+    task_id: str
+    status: str
+    current_agent: str
+    progress_percent: int
+    messages: List[str]
 
 
 class EvaluationResponse(BaseModel):
-    """Response from evaluating a solution."""
-    
-    score: float = Field(
-        ge=0.0,
-        le=1.0,
-        description="Quality score 0-1"
-    )
-    
-    feedback: str = Field(description="Detailed feedback")
-    strengths: List[str] = Field(description="What's good about the solution")
-    improvements: List[str] = Field(description="What could be better")
+    score: float = Field(ge=0.0, le=1.0)
+    feedback: str
+    strengths: List[str]
+    improvements: List[str]
+
+
+class KnowledgeUploadResponse(BaseModel):
+    filename: str
+    chunks_indexed: int
+    message: str
+
+
+class KnowledgeDocument(BaseModel):
+    source: str
+    chunks: int
+
+
+class KnowledgeSearchResult(BaseModel):
+    content: str
+    source: str
+    distance: float
+
+
+class AnalyticsSummary(BaseModel):
+    total_tasks: int
+    total_tokens: int
+    total_cost_usd: float
+    avg_execution_time: float
+    agent_performance: Dict[str, Any]
+    error_count: int
+    recent_errors: List[Dict[str, Any]]
+
+
+class IntegrationStatus(BaseModel):
+    github: bool
+    slack: bool
+    jira: bool
+    available_tools: List[str]
