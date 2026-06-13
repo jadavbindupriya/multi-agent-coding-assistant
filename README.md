@@ -140,6 +140,24 @@ FastAPI Backend
 - Node.js 18+
 - OpenAI API key
 
+## Documentation
+
+| Doc | Description |
+|-----|-------------|
+| [docs/SETUP.md](docs/SETUP.md) | Installation and configuration |
+| [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) | Contributing and extending agents |
+| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | System design and pipeline flow |
+| [docs/API.md](docs/API.md) | Full API reference with examples |
+
+## Examples
+
+| File | Description |
+|------|-------------|
+| [Examples/phase1_basics.md](Examples/phase1_basics.md) | Getting started guide |
+| [Examples/phase1_basic_api_call.py](Examples/phase1_basic_api_call.py) | Your first API call |
+| [Examples/example_api_calls.py](Examples/example_api_calls.py) | All endpoints demo |
+| [Examples/notebooks/exploring_llms.ipynb](Examples/notebooks/exploring_llms.ipynb) | LLM exploration notebook |
+
 ## License
 
 MIT
